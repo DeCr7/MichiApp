@@ -6,17 +6,35 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -88,12 +106,12 @@ fun PantallaInicio(navController: NavController) {
             painter = painterResource(id = R.drawable.michiapplogo),
             contentDescription = "Logo MichiApp",
             modifier = Modifier
-                .height(80.dp)
+                .height(360.dp)
         )
 
         Text(
-            text = "¡Bienvenido a la red social #1 para mininos!",
-            modifier = Modifier.padding(top = 8.dp, bottom = 20.dp)
+            text = "¡La Red Social Gatuna #1!",
+            modifier = Modifier.padding(top = 8.dp, bottom = 20.dp),
         )
 
         Button(
@@ -101,7 +119,7 @@ fun PantallaInicio(navController: NavController) {
                 navController.navigate("detalle")
             }
         ) {
-            Text("Ir a Detalle")
+            Text("Ir al Feed de Hoy")
         }
     }
 }
@@ -109,39 +127,111 @@ fun PantallaInicio(navController: NavController) {
 @Composable
 fun PantallaDetalle(navController: NavController) {
 
-    Column(
-        modifier = Modifier.background(
-            Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFFE3F2FD),
-                    Color(0xFFBBDEFB),
-                    Color(0xFFFFFFFF)
+    val publicaciones = listOf(
+        R.drawable.gato1,
+        R.drawable.gato2,
+        R.drawable.gato3,
+        R.drawable.gato4,
+        R.drawable.gato5,
+        R.drawable.gato6,
+        R.drawable.gato7,
+        R.drawable.gato8,
+        R.drawable.gato9,
+        R.drawable.gato10,
+        R.drawable.gato11,
+        R.drawable.gato12,
+        R.drawable.gato13,
+        R.drawable.gato14,
+        R.drawable.gato15
+    )
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFE3F2FD),
+                        Color(0xFFBBDEFB),
+                        Color.White
+                    )
                 )
             )
-        )
-            .fillMaxSize()
-            .padding(20.dp),
+            .padding(16.dp)
+    ) {
+        item {
+            Text(
+                text = "Feed Gatuno 🐱",
+                style = MaterialTheme.typography.headlineMedium
+            )
 
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        item {
+            Button(
+                onClick = { navController.navigate("perfil") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Ir a tu Perfil")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        items(publicaciones) { imagen ->
+            Publicacion(imagen)
+        }
+    }
+}
+
+@Composable
+fun Publicacion(imagen: Int) {
+
+    var rating by remember { mutableIntStateOf(0) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
     ) {
 
-        Text(
-            text = "Pantalla Detalle",
-            style = MaterialTheme.typography.headlineMedium
+        Image(
+            painter = painterResource(id = imagen),
+            contentDescription = "Gato",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         Text(
-            text = "Aquí va información importante.",
-            modifier = Modifier.padding(top = 8.dp, bottom = 20.dp)
+            text = "Michi publicando 🐱",
+            style = MaterialTheme.typography.bodyMedium
         )
 
-        Button(
-            onClick = {
-                navController.navigate("perfil")
-            }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Ir a Perfil")
+            for (i in 1..5) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Estrella $i",
+                    tint = if (i <= rating)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clickable {
+                            rating = i
+                        }
+                )
+            }
         }
     }
 }
@@ -150,36 +240,69 @@ fun PantallaDetalle(navController: NavController) {
 fun PantallaPerfil(navController: NavController) {
 
     Column(
-        modifier = Modifier.background(
-            Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFFF3E5F5),
-                    Color(0xFFE1BEE7),
-                    Color(0xFFFFFFFF)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFF3E5F5),
+                        Color(0xFFE1BEE7),
+                        Color.White
+                    )
                 )
             )
-        )
-            .fillMaxSize()
-            .padding(20.dp),
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
 
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         Text(
-            text = "Pantalla Perfil",
+            text = "Perfil de Leo 🐱",
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Text(
-            text = "Nombre: Usuario Demo",
-            modifier = Modifier.padding(top = 8.dp)
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Image(
+            painter = painterResource(id = R.drawable.catface),
+            contentDescription = "Foto de perfil",
+            modifier = Modifier
+                .size(140.dp)
+                .clip(CircleShape)
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
-            text = "Resumen de información",
-            modifier = Modifier.padding(bottom = 20.dp)
+                text = "Leo",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text("Analista de Software")
+        Text("Apasionado por el senderismo y pelear en los techos a las 3 AM")
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Image(
+            painter = painterResource(id = R.drawable.diagrama),
+            contentDescription = "Publicación destacada",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp)
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { }
+        ) {
+            Text("🔄 Compartir Perfil")
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = {
